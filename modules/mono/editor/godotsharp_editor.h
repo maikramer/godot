@@ -77,6 +77,7 @@ public:
 		EDITOR_NONE,
 		EDITOR_MONODEVELOP,
 		EDITOR_CODE,
+		EDITOR_CODE_INSIDERS
 	};
 
 	_FORCE_INLINE_ static GodotSharpEditor *get_singleton() { return singleton; }

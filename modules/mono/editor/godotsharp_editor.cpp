@@ -202,6 +202,28 @@ Error GodotSharpEditor::open_in_external_editor(const Ref<Script> &p_script, int
 				return err;
 			}
 		} break;
+		case EDITOR_CODE_INSIDERS: {
+			List<String> args;
+			args.push_back(ProjectSettings::get_singleton()->get_resource_path());
+
+			String script_path = ProjectSettings::get_singleton()->globalize_path(p_script->get_path());
+
+			if (p_line >= 0) {
+				args.push_back("-g");
+				args.push_back(script_path + ":" + itos(p_line + 1) + ":" + itos(p_col));
+			} else {
+				args.push_back(script_path);
+			}
+
+			static String program = path_which("code-insiders");
+
+			Error err = OS::get_singleton()->execute(program.length() ? program : "code-insiders", args, false);
+
+			if (err != OK) {
+				ERR_PRINT("GodotSharp: Could not execute external editor");
+				return err;
+			}
+		} break;
 		case EDITOR_MONODEVELOP: {
 			if (!monodevel_instance)
 				monodevel_instance = memnew(MonoDevelopInstance(GodotSharpDirs::get_project_sln_path()));
@@ -314,7 +336,7 @@ GodotSharpEditor::GodotSharpEditor(EditorNode *p_editor) {
 	// External editor settings
 	EditorSettings *ed_settings = EditorSettings::get_singleton();
 	EDITOR_DEF("mono/editor/external_editor", EDITOR_NONE);
-	ed_settings->add_property_hint(PropertyInfo(Variant::INT, "mono/editor/external_editor", PROPERTY_HINT_ENUM, "None,MonoDevelop,Visual Studio Code"));
+	ed_settings->add_property_hint(PropertyInfo(Variant::INT, "mono/editor/external_editor", PROPERTY_HINT_ENUM, "None,MonoDevelop,Visual Studio Code,Visual Studio Code Insiders"));
 }
 
 GodotSharpEditor::~GodotSharpEditor() {
